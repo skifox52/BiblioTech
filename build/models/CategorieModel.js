@@ -7,11 +7,8 @@ const CategorieSchema = new Schema({
     },
     nomCat: {
         type: String,
+        unique: true,
         required: true,
-    },
-    Data_ajout: {
-        type: Date,
-        default: new Date(),
     },
 }, { timestamps: true });
 const CatModel = model("Categorie", CategorieSchema);

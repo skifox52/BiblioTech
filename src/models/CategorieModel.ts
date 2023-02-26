@@ -15,11 +15,8 @@ const CategorieSchema = new Schema<CatSchemaType>(
     },
     nomCat: {
       type: String,
+      unique: true,
       required: true,
-    },
-    Data_ajout: {
-      type: Date,
-      default: new Date(),
     },
   },
   { timestamps: true }
