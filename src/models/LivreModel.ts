@@ -5,6 +5,8 @@ interface LivreSchemaType {
   idCat: Types.ObjectId
   nomLivre: string
   auteur: string
+  nb_emprunt: number
+  note: number
   nb_total: number
   nb_restant: number
 }
@@ -19,9 +21,18 @@ const LivreSchema = new Schema<LivreSchemaType>(
     nomLivre: {
       type: String,
       required: true,
+      unique: true,
     },
     auteur: {
       type: String,
+      required: true,
+    },
+    nb_emprunt: {
+      type: Number,
+      default: 0,
+    },
+    note: {
+      type: Number,
       required: true,
     },
     nb_total: {

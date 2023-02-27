@@ -5,12 +5,14 @@ import "dotenv/config";
 import UserRouter from "./routers/UserRouter.js";
 import catRouter from "./routers/CatRouter.js";
 import LivreRouter from "./routers/LivreRouter.js";
+import DetailEmpruntRouter from "./routers/DetailEmpruntRouter.js";
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use("/api/user", UserRouter);
 app.use("/api/category", catRouter);
 app.use("/api/livre", LivreRouter);
+app.use("/api/detail", DetailEmpruntRouter);
 //Not found
 app.use("/*", (req, res) => {
     res.status(404);

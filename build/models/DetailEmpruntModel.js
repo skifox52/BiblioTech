@@ -15,6 +15,10 @@ const DetailEmpruntSchema = new Schema({
         type: Number,
         required: true,
     },
+    rendu: {
+        type: Boolean,
+        default: false,
+    },
 }, { timestamps: true });
 const DetailEmpruntModel = model("DetailEmprunt", DetailEmpruntSchema);
 export default DetailEmpruntModel;

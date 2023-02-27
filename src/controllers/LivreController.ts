@@ -14,12 +14,63 @@ export const findAll = expressAsyncHandler(
     }
   }
 )
+//Livre par catégorie
+export const findByCat = expressAsyncHandler(
+  async (req: Request, res: Response) => {
+    try {
+      const { idCat } = req.body
+      if (!idCat) {
+        res.status(400)
+        throw new Error("No category!")
+      }
+      const book = await LivreModel.find({ idCat })
+      res.status(200).json(book)
+    } catch (error: any) {
+      res.status(400)
+      throw new Error(error)
+    }
+  }
+)
+//Livre par auteur
+export const findByAuteur = expressAsyncHandler(
+  async (req: Request, res: Response) => {
+    try {
+      const { auteur } = req.body
+      if (!auteur) {
+        res.status(400)
+        throw new Error("No auteur!")
+      }
+      const book = await LivreModel.find({ auteur })
+      res.status(200).json(book)
+    } catch (error: any) {
+      res.status(400)
+      throw new Error(error)
+    }
+  }
+)
+//Livre par auteur
+export const findByNote = expressAsyncHandler(
+  async (req: Request, res: Response) => {
+    try {
+      const { note } = req.body
+      if (!note) {
+        res.status(400)
+        throw new Error("No note!")
+      }
+      const book = await LivreModel.find({ note: { $gte: note } })
+      res.status(200).json(book)
+    } catch (error: any) {
+      res.status(400)
+      throw new Error(error)
+    }
+  }
+)
 // Ajouter un livre
 export const addOneBook = expressAsyncHandler(
   async (req: Request, res: Response) => {
     try {
-      const { idCat, nomLivre, auteur, nb_total, nb_restant } = req.body
-      if (!idCat || !nomLivre || !auteur || !nb_total || !nb_restant) {
+      const { idCat, nomLivre, auteur, nb_total, note } = req.body
+      if (!idCat || !nomLivre || !auteur || !nb_total || !note) {
         res.status(400)
         throw new Error("Empty fields!")
       }
@@ -28,7 +79,7 @@ export const addOneBook = expressAsyncHandler(
         nomLivre,
         auteur,
         nb_total,
-        nb_restant,
+        note,
       })
       res.status(201).json("Book created successfully!")
     } catch (error: any) {

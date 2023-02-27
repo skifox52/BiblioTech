@@ -9,9 +9,18 @@ const LivreSchema = new Schema({
     nomLivre: {
         type: String,
         required: true,
+        unique: true,
     },
     auteur: {
         type: String,
+        required: true,
+    },
+    nb_emprunt: {
+        type: Number,
+        default: 0,
+    },
+    note: {
+        type: Number,
         required: true,
     },
     nb_total: {

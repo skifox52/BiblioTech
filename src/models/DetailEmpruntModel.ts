@@ -5,6 +5,7 @@ interface DetailSchemaType {
   id_util: Types.ObjectId
   id_livre: Types.ObjectId
   duree: number
+  rendu: boolean
 }
 //Detail Schame
 const DetailEmpruntSchema = new Schema<DetailSchemaType>(
@@ -22,6 +23,10 @@ const DetailEmpruntSchema = new Schema<DetailSchemaType>(
     duree: {
       type: Number,
       required: true,
+    },
+    rendu: {
+      type: Boolean,
+      default: false,
     },
   },
   { timestamps: true }
