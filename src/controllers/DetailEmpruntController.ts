@@ -65,6 +65,7 @@ export const updateDetail = expressAsyncHandler(
         { id_util, id_livre: id },
         { rendu: true }
       )
+      await LivreModel.findByIdAndUpdate(id, { $inc: { nb_restant: 1 } })
       res.status(202).json("Book returned successfully!")
     } catch (error: any) {
       res.status(400)

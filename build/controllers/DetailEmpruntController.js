@@ -68,6 +68,7 @@ export const updateDetail = expressAsyncHandler((req, res) => __awaiter(void 0, 
             throw new Error("No user specified!");
         }
         yield DetailEmpruntModel.findOneAndUpdate({ id_util, id_livre: id }, { rendu: true });
+        yield LivreModel.findByIdAndUpdate(id, { $inc: { nb_restant: 1 } });
         res.status(202).json("Book returned successfully!");
     }
     catch (error) {
