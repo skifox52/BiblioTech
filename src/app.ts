@@ -7,7 +7,6 @@ import catRouter from "./routers/CatRouter.js"
 import LivreRouter from "./routers/LivreRouter.js"
 import DetailEmpruntRouter from "./routers/DetailEmpruntRouter.js"
 import StatsRouter from "./routers/StatsRouter.js"
-import sendMail from "./nodeMailer.js"
 
 const app: Application = express()
 app.use(express.json())
@@ -17,7 +16,6 @@ app.use("/api/category", catRouter)
 app.use("/api/livre", LivreRouter)
 app.use("/api/detail", DetailEmpruntRouter)
 app.use("/api/stats", StatsRouter)
-app.post("/api/mail", sendMail)
 //Not found
 app.use("/*", (req: Request, res: Response) => {
   res.status(404)

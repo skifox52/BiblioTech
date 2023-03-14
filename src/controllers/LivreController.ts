@@ -2,6 +2,9 @@ import expressAsyncHandler from "express-async-handler"
 import { Request, Response } from "express"
 import LivreModel from "../models/LivreModel.js"
 import CommentModel from "../models/CommentModel.js"
+import UserModel from "../models/UserModel.js"
+//@ts-ignore
+import nodemailer from "nodemailer"
 // Afficher tout les livres
 export const findAll = expressAsyncHandler(
   async (req: Request, res: Response) => {
@@ -81,6 +84,37 @@ export const addOneBook = expressAsyncHandler(
         nb_total,
         note,
       })
+      //@ts-ignore
+      const transporter = nodemailer.createTransport({
+        host: "smtp.ethereal.email",
+        port: 587,
+        auth: {
+          user: "bobbie.gislason@ethereal.email",
+          pass: "UCurANP6eCGauTsB2V",
+        },
+      })
+
+      UserModel.find()
+        .then((user) => {
+          user.forEach((us) => {
+            const message = {
+              from: "your_email@gmail.com",
+              to: `${us.mail}`,
+              subject: "New Book",
+              text: "This is a test email sent using Nodemailer!",
+            }
+            transporter.sendMail(message, function (error: any, info: any) {
+              if (error) {
+                console.log(error)
+              } else {
+                console.log("Email sent: " + info.response)
+              }
+            })
+          })
+        })
+        .catch((err: any) => {
+          console.error(err)
+        })
       res.status(201).json("Book created successfully!")
     } catch (error: any) {
       res.status(400)

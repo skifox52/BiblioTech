@@ -5,6 +5,8 @@ import { compare, hash } from "bcrypt"
 import RefreshTokenModel from "../models/RefreshTokenModel.js"
 import UserModel from "../models/UserModel.js"
 import jwt from "jsonwebtoken"
+//@ts-ignore
+import nodemailer from "nodemailer"
 
 //Generate token Function
 //Types
@@ -60,6 +62,30 @@ export const registerUser = expressAsyncHandler(
         role: User.role,
         accessToken,
         refreshToken,
+      })
+      //Nodemailer
+      //@ts-ignore
+      const transporter = nodemailer.createTransport({
+        host: "smtp.ethereal.email",
+        port: 587,
+        auth: {
+          user: "bobbie.gislason@ethereal.email",
+          pass: "UCurANP6eCGauTsB2V",
+        },
+      })
+
+      const message = {
+        from: "your_email@gmail.com",
+        to: `${User.mail}`,
+        subject: "New Book",
+        text: "This is a test email sent using Nodemailer!",
+      }
+      transporter.sendMail(message, function (error: any, info: any) {
+        if (error) {
+          console.log(error)
+        } else {
+          console.log("Email sent: " + info.response)
+        }
       })
       res.status(201).json("User created successfully!")
     } catch (error: any) {
