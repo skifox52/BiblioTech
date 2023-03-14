@@ -6,6 +6,7 @@ interface DetailSchemaType {
   id_livre: Types.ObjectId
   duree: number
   rendu: boolean
+  renew: boolean
 }
 //Detail Schame
 const DetailEmpruntSchema = new Schema<DetailSchemaType>(
@@ -25,6 +26,10 @@ const DetailEmpruntSchema = new Schema<DetailSchemaType>(
       required: true,
     },
     rendu: {
+      type: Boolean,
+      default: false,
+    },
+    renew: {
       type: Boolean,
       default: false,
     },

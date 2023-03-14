@@ -5,6 +5,8 @@ import {
   findByAuteur,
   findByCat,
   findByNote,
+  postCommentaire,
+  postReply,
   updateBook,
 } from "../controllers/LivreController.js"
 import { Router } from "express"
@@ -18,5 +20,7 @@ const LivreRouter = Router()
   .get("/cat", protect, findByCat)
   .get("/auteur", protect, findByAuteur)
   .get("/note", protect, findByNote)
+  .post("/commentaire/:id", protect, postCommentaire)
+  .post("/commentaire_reply/:id_book/:id_coment", protect, postReply)
 
 export default LivreRouter

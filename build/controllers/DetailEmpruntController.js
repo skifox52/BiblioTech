@@ -11,6 +11,35 @@ import expressAsyncHandler from "express-async-handler";
 import DetailEmpruntModel from "../models/DetailEmpruntModel.js";
 import LivreModel from "../models/LivreModel.js";
 import UserModel from "../models/UserModel.js";
+//Planificateur
+import cron from "node-cron";
+//Vérifier si l'utilisateur a dépasser l'emprunt
+const verifierEmprunt = () => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const currentDate = new Date().getTime();
+        const nonRendu = yield DetailEmpruntModel.find({ rendu: false });
+        let Users = [];
+        nonRendu.forEach((emp) => {
+            //@ts-ignore
+            if (emp.createdAt.getTime() + emp.duree * 24 * 3600 < currentDate) {
+                //@ts-ignore
+                Users.push(emp.id_util);
+            }
+        });
+        if (Users.length > 0) {
+            for (let i = 0; i < Users.length; i++) {
+                yield UserModel.findByIdAndUpdate(Users[i], { active: false });
+            }
+        }
+    }
+    catch (error) {
+        throw new Error("Error on scheduler!");
+    }
+});
+//Schedule every day it executes the function
+cron.schedule("0 0 0 * * *", () => {
+    verifierEmprunt();
+});
 // Add detail emprunt
 export const addDetail = expressAsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b, _c;
@@ -58,6 +87,38 @@ export const addDetail = expressAsyncHandler((req, res) => __awaiter(void 0, voi
         throw new Error(error);
     }
 }));
+//Renouvler Empreint
+export const renouvlerEmpreint = expressAsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id } = req.params;
+        const { duree } = req.query;
+        const empreint = yield DetailEmpruntModel.findById(id);
+        if (!empreint) {
+            res.status(400);
+            throw new Error("Pas d'empreint en cours!");
+        }
+        if (empreint.renew === true) {
+            res.status(400);
+            throw new Error("Vous avez déja renouveller cet enmpreint!");
+        }
+        const renewedBooks = yield DetailEmpruntModel.find({
+            renew: true,
+        }).select("id_livre");
+        renewedBooks.forEach((book) => {
+            if (book._id.toString() === empreint._id.toString()) {
+                res.status(400);
+                throw new Error("Vous avez déja renouveller pour ce livre!");
+            }
+        });
+        empreint.duree += parseInt(duree);
+        empreint.renew = true;
+        yield empreint.save();
+    }
+    catch (error) {
+        res.status(400);
+        throw new Error(error);
+    }
+}));
 // Update detail emprunt weh user returns the book
 export const updateDetail = expressAsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -81,6 +142,20 @@ export const findAllDetails = expressAsyncHandler((req, res) => __awaiter(void 0
     try {
         const allDetailEmprunt = yield DetailEmpruntModel.find();
         res.status(200).json(allDetailEmprunt);
+    }
+    catch (error) {
+        res.status(400);
+        throw new Error(error);
+    }
+}));
+//Find historique empreint of a user
+export const findHistorique = expressAsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _d;
+    try {
+        const historiqueUser = yield DetailEmpruntModel.find({
+            id_util: (_d = req.user) === null || _d === void 0 ? void 0 : _d._id,
+        });
+        res.status(200).json(historiqueUser);
     }
     catch (error) {
         res.status(400);

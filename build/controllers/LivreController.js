@@ -9,6 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 import expressAsyncHandler from "express-async-handler";
 import LivreModel from "../models/LivreModel.js";
+import CommentModel from "../models/CommentModel.js";
 // Afficher tout les livres
 export const findAll = expressAsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -108,6 +109,89 @@ export const deleteBook = expressAsyncHandler((req, res) => __awaiter(void 0, vo
         const { id } = req.params;
         yield LivreModel.findByIdAndDelete(id);
         res.status(200).json("Book deleted successfullty!");
+    }
+    catch (error) {
+        res.status(400);
+        throw new Error(error);
+    }
+}));
+//Post commentaire
+export const postCommentaire = expressAsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    try {
+        const { id } = req.params;
+        const { body } = req.body;
+        if (!body) {
+            res.status(400);
+            throw new Error("Empty fields!");
+        }
+        const exists = yield LivreModel.findById(id);
+        console.log(exists);
+        if (!exists) {
+            res.status(400);
+            throw new Error("Book doesn't exist!");
+        }
+        const comment = yield CommentModel.create({
+            id_utilisateur: (_a = req.user) === null || _a === void 0 ? void 0 : _a._id,
+            body,
+        });
+        yield LivreModel.findByIdAndUpdate(id, {
+            $push: { commentaires: comment._id },
+        });
+        res.status(200).json("Comment added successfully!");
+    }
+    catch (error) {
+        res.status(400);
+        throw new Error(error);
+    }
+}));
+//Modifier un commentaire
+export const putComment = expressAsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id } = req.params;
+        const { body } = req.body;
+        if (!body) {
+            res.status(400);
+            throw new Error("Empty fields!");
+        }
+        yield CommentModel.findByIdAndUpdate(id, { body });
+        res.status(202).json("Comment updated successfully!");
+    }
+    catch (err) {
+        res.status(400);
+        throw new Error(err);
+    }
+}));
+//Supprimer un commentaire
+export const deleteComment = expressAsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id } = req.params;
+        yield CommentModel.findByIdAndDelete(id);
+        res.status(200).json("Comment deleted successfully!");
+    }
+    catch (error) {
+        res.status(400);
+        throw new Error(error);
+    }
+}));
+//Post Reply comment
+export const postReply = expressAsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _b;
+    try {
+        const { body } = req.body;
+        const { id_coment, id_book } = req.params;
+        //Add to coment model
+        const replyComment = yield CommentModel.create({
+            id_utilisateur: (_b = req.user) === null || _b === void 0 ? void 0 : _b._id,
+            body,
+            reply: true,
+        });
+        //Add the reply
+        console.log(replyComment);
+        yield LivreModel.findByIdAndUpdate(id_book, {
+            $push: { "commentaires.$[commentaire].reply": replyComment._id },
+        }, { arrayFilters: [{ "commentaire._id": id_coment }] });
+        res.status(200).json("Reply added");
     }
     catch (error) {
         res.status(400);

@@ -1,4 +1,4 @@
-import { addOneBook, deleteBook, findAll, findByAuteur, findByCat, findByNote, updateBook, } from "../controllers/LivreController.js";
+import { addOneBook, deleteBook, findAll, findByAuteur, findByCat, findByNote, postCommentaire, postReply, updateBook, } from "../controllers/LivreController.js";
 import { Router } from "express";
 import { protect, protectEmployee } from "../middleware/Protect.js";
 const LivreRouter = Router()
@@ -8,5 +8,7 @@ const LivreRouter = Router()
     .delete("/:id", protectEmployee, deleteBook)
     .get("/cat", protect, findByCat)
     .get("/auteur", protect, findByAuteur)
-    .get("/note", protect, findByNote);
+    .get("/note", protect, findByNote)
+    .post("/commentaire/:id", protect, postCommentaire)
+    .post("/commentaire_reply/:id_book/:id_coment", protect, postReply);
 export default LivreRouter;

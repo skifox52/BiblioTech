@@ -9,6 +9,7 @@ interface LivreSchemaType {
   note: number
   nb_total: number
   nb_restant: number
+  commentaires?: Types.ObjectId[]
 }
 //Livre Schema
 const LivreSchema = new Schema<LivreSchemaType>(
@@ -45,11 +46,21 @@ const LivreSchema = new Schema<LivreSchemaType>(
         return this.nb_total
       },
     },
+    commentaires: [
+      {
+        id_com: { type: SchemaTypes.ObjectId, ref: "Commentaire" },
+        reply: [
+          {
+            id_reply: { type: SchemaTypes.ObjectId, ref: "Commentaire" },
+          },
+        ],
+        required: false,
+      },
+    ],
   },
   {
     timestamps: true,
   }
 )
-
-const LivreModel = model("Livre", LivreSchema)
+const LivreModel = model<LivreSchemaType>("Livre", LivreSchema)
 export default LivreModel

@@ -1,7 +1,7 @@
 import expressAsyncHandler from "express-async-handler"
 import { Request, Response } from "express"
 import LivreModel from "../models/LivreModel.js"
-
+import CommentModel from "../models/CommentModel.js"
 // Afficher tout les livres
 export const findAll = expressAsyncHandler(
   async (req: Request, res: Response) => {
@@ -108,6 +108,96 @@ export const deleteBook = expressAsyncHandler(
       const { id } = req.params
       await LivreModel.findByIdAndDelete(id)
       res.status(200).json("Book deleted successfullty!")
+    } catch (error: any) {
+      res.status(400)
+      throw new Error(error)
+    }
+  }
+)
+//Post commentaire
+export const postCommentaire = expressAsyncHandler(
+  async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params
+      const { body } = req.body
+      if (!body) {
+        res.status(400)
+        throw new Error("Empty fields!")
+      }
+      const exists = await LivreModel.findById(id)
+      console.log(exists)
+      if (!exists) {
+        res.status(400)
+        throw new Error("Book doesn't exist!")
+      }
+      const comment = await CommentModel.create({
+        id_utilisateur: req.user?._id,
+        body,
+      })
+      await LivreModel.findByIdAndUpdate(id, {
+        $push: { commentaires: comment._id },
+      })
+      res.status(200).json("Comment added successfully!")
+    } catch (error: any) {
+      res.status(400)
+      throw new Error(error)
+    }
+  }
+)
+//Modifier un commentaire
+export const putComment = expressAsyncHandler(
+  async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params
+      const { body } = req.body
+      if (!body) {
+        res.status(400)
+        throw new Error("Empty fields!")
+      }
+      await CommentModel.findByIdAndUpdate(id, { body })
+      res.status(202).json("Comment updated successfully!")
+    } catch (err: any) {
+      res.status(400)
+      throw new Error(err)
+    }
+  }
+)
+//Supprimer un commentaire
+export const deleteComment = expressAsyncHandler(
+  async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params
+      await CommentModel.findByIdAndDelete(id)
+      res.status(200).json("Comment deleted successfully!")
+    } catch (error: any) {
+      res.status(400)
+      throw new Error(error)
+    }
+  }
+)
+//Post Reply comment
+export const postReply = expressAsyncHandler(
+  async (req: Request, res: Response) => {
+    try {
+      const { body } = req.body
+      const { id_coment, id_book } = req.params
+      //Add to coment model
+      const replyComment = await CommentModel.create({
+        id_utilisateur: req.user?._id,
+        body,
+        reply: true,
+      })
+      //Add the reply
+      console.log(replyComment)
+      await LivreModel.findByIdAndUpdate(
+        id_book,
+        {
+          $push: { "commentaires.$[commentaire].reply": replyComment._id },
+        },
+        { arrayFilters: [{ "commentaire._id": id_coment }] }
+      )
+
+      res.status(200).json("Reply added")
     } catch (error: any) {
       res.status(400)
       throw new Error(error)

@@ -19,6 +19,10 @@ const DetailEmpruntSchema = new Schema({
         type: Boolean,
         default: false,
     },
+    renew: {
+        type: Boolean,
+        default: false,
+    },
 }, { timestamps: true });
 const DetailEmpruntModel = model("DetailEmprunt", DetailEmpruntSchema);
 export default DetailEmpruntModel;

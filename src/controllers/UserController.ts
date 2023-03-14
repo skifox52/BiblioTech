@@ -13,7 +13,7 @@ interface TokenType {
   role: string
 }
 const signToken = (data: TokenType) => {
-  return jwt.sign(data, process.env.ACCESS_TOKEN_SECRET!, { expiresIn: "10m" })
+  return jwt.sign(data, process.env.ACCESS_TOKEN_SECRET!, { expiresIn: "10h" })
 }
 //Register a user
 export const registerUser = expressAsyncHandler(

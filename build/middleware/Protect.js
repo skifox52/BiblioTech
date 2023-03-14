@@ -51,3 +51,26 @@ export const protectEmployee = expressAsyncHandler((req, res, next) => __awaiter
         throw new Error(error);
     }
 }));
+//Protect Admin
+export const protectAdmin = expressAsyncHandler((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const authHeader = req.headers["authorization"];
+        const token = authHeader && authHeader.split(" ")[1];
+        if (!token) {
+            res.status(400);
+            throw new Error("Unauthorized! No token!");
+        }
+        const tokenData = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+        const { _id, role } = tokenData;
+        if (role !== "Admin") {
+            res.status(400);
+            throw new Error("You are not authorized! You're not an Admin!");
+        }
+        req.user = { _id, role };
+        next();
+    }
+    catch (error) {
+        res.status(400);
+        throw new Error(error);
+    }
+}));

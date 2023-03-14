@@ -33,6 +33,17 @@ const LivreSchema = new Schema({
             return this.nb_total;
         },
     },
+    commentaires: [
+        {
+            id_com: { type: SchemaTypes.ObjectId, ref: "Commentaire" },
+            reply: [
+                {
+                    id_reply: { type: SchemaTypes.ObjectId, ref: "Commentaire" },
+                },
+            ],
+            required: false,
+        },
+    ],
 }, {
     timestamps: true,
 });

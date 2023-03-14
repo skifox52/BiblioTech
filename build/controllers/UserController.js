@@ -24,7 +24,7 @@ import RefreshTokenModel from "../models/RefreshTokenModel.js";
 import UserModel from "../models/UserModel.js";
 import jwt from "jsonwebtoken";
 const signToken = (data) => {
-    return jwt.sign(data, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "10m" });
+    return jwt.sign(data, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "10h" });
 };
 //Register a user
 export const registerUser = expressAsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
