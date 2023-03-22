@@ -222,7 +222,6 @@ export const postReply = expressAsyncHandler(
         reply: true,
       })
       //Add the reply
-      console.log(replyComment)
       await LivreModel.findByIdAndUpdate(
         id_book,
         {

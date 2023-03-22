@@ -23,6 +23,8 @@ import { compare, hash } from "bcrypt";
 import RefreshTokenModel from "../models/RefreshTokenModel.js";
 import UserModel from "../models/UserModel.js";
 import jwt from "jsonwebtoken";
+//@ts-ignore
+import nodemailer from "nodemailer";
 const signToken = (data) => {
     return jwt.sign(data, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "10h" });
 };
@@ -64,6 +66,30 @@ export const registerUser = expressAsyncHandler((req, res) => __awaiter(void 0, 
             role: User.role,
             accessToken,
             refreshToken,
+        });
+        //Nodemailer
+        //@ts-ignore
+        const transporter = nodemailer.createTransport({
+            host: "smtp.ethereal.email",
+            port: 587,
+            auth: {
+                user: "bobbie.gislason@ethereal.email",
+                pass: "UCurANP6eCGauTsB2V",
+            },
+        });
+        const message = {
+            from: "your_email@gmail.com",
+            to: `${User.mail}`,
+            subject: "New Book",
+            text: "This is a test email sent using Nodemailer!",
+        };
+        transporter.sendMail(message, function (error, info) {
+            if (error) {
+                console.log(error);
+            }
+            else {
+                console.log("Email sent: " + info.response);
+            }
         });
         res.status(201).json("User created successfully!");
     }

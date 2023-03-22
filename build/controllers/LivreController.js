@@ -10,6 +10,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 import expressAsyncHandler from "express-async-handler";
 import LivreModel from "../models/LivreModel.js";
 import CommentModel from "../models/CommentModel.js";
+import UserModel from "../models/UserModel.js";
+//@ts-ignore
+import nodemailer from "nodemailer";
 // Afficher tout les livres
 export const findAll = expressAsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -83,6 +86,37 @@ export const addOneBook = expressAsyncHandler((req, res) => __awaiter(void 0, vo
             auteur,
             nb_total,
             note,
+        });
+        //@ts-ignore
+        const transporter = nodemailer.createTransport({
+            host: "smtp.ethereal.email",
+            port: 587,
+            auth: {
+                user: "bobbie.gislason@ethereal.email",
+                pass: "UCurANP6eCGauTsB2V",
+            },
+        });
+        UserModel.find()
+            .then((user) => {
+            user.forEach((us) => {
+                const message = {
+                    from: "your_email@gmail.com",
+                    to: `${us.mail}`,
+                    subject: "New Book",
+                    text: "This is a test email sent using Nodemailer!",
+                };
+                transporter.sendMail(message, function (error, info) {
+                    if (error) {
+                        console.log(error);
+                    }
+                    else {
+                        console.log("Email sent: " + info.response);
+                    }
+                });
+            });
+        })
+            .catch((err) => {
+            console.error(err);
         });
         res.status(201).json("Book created successfully!");
     }
@@ -187,7 +221,6 @@ export const postReply = expressAsyncHandler((req, res) => __awaiter(void 0, voi
             reply: true,
         });
         //Add the reply
-        console.log(replyComment);
         yield LivreModel.findByIdAndUpdate(id_book, {
             $push: { "commentaires.$[commentaire].reply": replyComment._id },
         }, { arrayFilters: [{ "commentaire._id": id_coment }] });
